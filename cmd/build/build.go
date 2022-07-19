@@ -20,9 +20,13 @@ var (
 // for building a package from a content template.
 func GetBuildCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:     "build",
-		Short:   "Builds a package from a template.",
-		Long:    "Builds a package from a template.",
+		Use:   "build",
+		Short: "Builds a package from a template.",
+		Long: `Builds a package from a template.
+
+When building a package you can optionally specify a source directory and a target directory.
+
+If either flag is omitted, the current working directory will be used.`,
 		PreRunE: preRun,
 		RunE:    run,
 	}
