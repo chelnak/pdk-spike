@@ -38,6 +38,13 @@ PDK includes testing tools, a complete module skeleton, and command line tools t
 	return rootCmd
 }
 
+func formatError(err error) {
+	fmt.Println("\n❌ It looks like something went wrong!\n\nFor more details try running the command again with --debug.")
+	fmt.Println("\nReported errors:")
+	fmt.Fprintln(os.Stderr, fmt.Errorf("• %s", err))
+	fmt.Println()
+}
+
 func Execute() int {
 	rootCmd := getRootCmd()
 
@@ -57,7 +64,7 @@ func Execute() int {
 
 	if err := rootCmd.Execute(); err != nil {
 		if err != errSilent {
-			fmt.Fprintln(os.Stderr, fmt.Errorf("❌ %s", err))
+			formatError(err)
 		}
 
 		return 1
