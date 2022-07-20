@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/chelnak/pdk/internal/config"
+	"github.com/chelnak/pdk/internal/utils/terminal"
 	"github.com/spf13/cobra"
 )
 
@@ -27,6 +28,11 @@ func getShowCmd() *cobra.Command {
 }
 
 func run(cmd *cobra.Command, args []string) error {
+	// Prevent ascii escape codes from being printed when we are not in a TTY
+	if !terminal.IsTTY() && !noColor {
+		noColor = true
+	}
+
 	switch output {
 	case "json":
 		return config.PrintJSON(noColor, os.Stdout)
