@@ -14,10 +14,14 @@ import (
 	"github.com/chelnak/pdk/cmd/install"
 	"github.com/chelnak/pdk/cmd/runtime"
 	"github.com/chelnak/pdk/cmd/validate"
+	"github.com/chelnak/pdk/internal/config"
 	"github.com/spf13/cobra"
 )
 
-var errSilent = errors.New("ErrSilent")
+var (
+	errSilent  = errors.New("ErrSilent")
+	configFile string
+)
 
 func getRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
@@ -29,13 +33,21 @@ The Puppet Development Kit includes key Puppet code development and testing tool
 so you can install one package with the tools you need to create and validate new modules.
 
 PDK includes testing tools, a complete module skeleton, and command line tools to help you create, validate, and run tests on Puppet modules.`,
-		Args:          cobra.MinimumNArgs(1),
-		SilenceErrors: true,
-		SilenceUsage:  true,
-		Run:           nil,
+		SilenceErrors:     true,
+		SilenceUsage:      true,
+		PersistentPreRunE: persistentPreRun,
 	}
 
+	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "Path to a config file. This will override the default config file located at $HOME/.config/puppetlabs/pdk/.pdk.yaml.")
+	_ = rootCmd.MarkFlagFilename("config", "yaml", "yml")
+
+	rootCmd.PersistentFlags().BoolP("debug", "d", false, "Enable debug mode.")
+
 	return rootCmd
+}
+
+func persistentPreRun(cmd *cobra.Command, args []string) error {
+	return config.InitConfig(configFile)
 }
 
 func formatError(err error) {
@@ -45,6 +57,7 @@ func formatError(err error) {
 	fmt.Println()
 }
 
+// Execute is the entrypoint for the cli. It is called directly from main.
 func Execute() int {
 	rootCmd := getRootCmd()
 

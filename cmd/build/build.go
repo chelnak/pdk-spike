@@ -66,6 +66,7 @@ func run(cmd *cobra.Command, args []string) error {
 	builder := build.NewBuilder()
 	archive, err := builder.Build(sourceDir, targetDir)
 	if err != nil {
+		spinner.Error()
 		return err
 	}
 
