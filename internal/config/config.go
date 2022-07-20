@@ -68,6 +68,21 @@ func setDefaults() {
 	viper.SetDefault("tool_timeout", 1800)
 }
 
+// Set sets the value of the given key to the given value.
+// This method needs far more validation that it currently has.
+// it also needs to be able to handle complex types and should probably
+// be validated against a schema/struct.
+func Set(key string, value interface{}) error {
+	viper.Set(key, value)
+
+	err := viper.WriteConfig()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
 type writeOptions struct {
 	data      string
 	lexerName string

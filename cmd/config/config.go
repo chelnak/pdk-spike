@@ -11,6 +11,7 @@ func GetConfigCmd() *cobra.Command {
 	}
 
 	cmd.AddCommand(getShowCmd())
+	cmd.AddCommand(getSetCmd())
 
 	return cmd
 }
