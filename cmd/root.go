@@ -8,13 +8,14 @@ import (
 	"os"
 
 	"github.com/chelnak/pdk/cmd/build"
+	"github.com/chelnak/pdk/cmd/config"
 	"github.com/chelnak/pdk/cmd/content"
 	"github.com/chelnak/pdk/cmd/exec"
 	"github.com/chelnak/pdk/cmd/explain"
 	"github.com/chelnak/pdk/cmd/install"
 	"github.com/chelnak/pdk/cmd/runtime"
 	"github.com/chelnak/pdk/cmd/validate"
-	"github.com/chelnak/pdk/internal/config"
+	appConfig "github.com/chelnak/pdk/internal/config"
 	"github.com/spf13/cobra"
 )
 
@@ -47,7 +48,7 @@ PDK includes testing tools, a complete module skeleton, and command line tools t
 }
 
 func persistentPreRun(cmd *cobra.Command, args []string) error {
-	return config.InitConfig(configFile)
+	return appConfig.InitConfig(configFile)
 }
 
 func formatError(err error) {
@@ -74,6 +75,7 @@ func Execute() int {
 	rootCmd.AddCommand(validate.GetValidateCmd())
 	rootCmd.AddCommand(runtime.GetRuntimeCmd())
 	rootCmd.AddCommand(explain.GetExplainCmd())
+	rootCmd.AddCommand(config.GetConfigCmd())
 
 	if err := rootCmd.Execute(); err != nil {
 		if err != errSilent {
