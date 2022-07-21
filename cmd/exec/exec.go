@@ -11,9 +11,7 @@ func GetExecCmd() *cobra.Command {
 		Use:   "exec",
 		Short: "Executes a given tool against some Puppet Content.",
 		Long:  "Executes a given tool against some Puppet Content.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return nil
-		},
+		RunE:  nil,
 	}
 
 	return cmd

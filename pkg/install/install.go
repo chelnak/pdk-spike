@@ -1,3 +1,5 @@
+// Package install handles the installtion of a Puppet Content template
+// package.
 package install
 
 import (

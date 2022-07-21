@@ -1,3 +1,4 @@
+// Package stringutils contains utility functions for working with strings.
 package stringutils
 
 import "regexp"

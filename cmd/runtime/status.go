@@ -7,9 +7,7 @@ func getStatusCmd() *cobra.Command {
 		Use:   "status",
 		Short: "Shows the status of the runtime.",
 		Long:  "Shows the status of the runtime.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return nil
-		},
+		RunE:  nil,
 	}
 
 	return cmd

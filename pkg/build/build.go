@@ -1,3 +1,4 @@
+// Package build contains commands for building a pdk project.
 package build
 
 import (

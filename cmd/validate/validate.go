@@ -12,9 +12,7 @@ func GetValidateCmd() *cobra.Command {
 		Use:   "validate",
 		Short: "Validates Puppet Content with a given tool.",
 		Long:  "Validates Puppet Content with a given tool.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return nil
-		},
+		RunE:  nil,
 	}
 
 	return cmd

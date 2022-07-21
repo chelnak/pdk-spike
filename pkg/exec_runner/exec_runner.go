@@ -1,4 +1,5 @@
-package exec_runner
+// Package exec_runner contains utility functions for executing commands.
+package exec_runner // nolint
 
 import (
 	"os"
