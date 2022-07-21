@@ -19,7 +19,7 @@ func getShowCmd() *cobra.Command {
 		Use:   "show",
 		Short: "Prints the current configuration to the terminal in either JSON or YAML format. Defaults to YAML.",
 		Long:  "Prints the current configuration to the terminal in either JSON or YAML format. Defaults to YAML.",
-		RunE:  run,
+		RunE:  showRunE,
 	}
 
 	cmd.Flags().StringVarP(&output, "output", "o", "yaml", "The output format. Valid values are 'json' and 'yaml'. Defaults to 'yaml'.")
@@ -27,7 +27,7 @@ func getShowCmd() *cobra.Command {
 	return cmd
 }
 
-func run(cmd *cobra.Command, args []string) error {
+func showRunE(cmd *cobra.Command, args []string) error {
 	// Prevent ascii escape codes from being printed when we are not in a TTY
 	if !terminal.IsTTY() && !noColor {
 		noColor = true

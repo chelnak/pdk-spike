@@ -11,9 +11,7 @@ func GetExplainCmd() *cobra.Command {
 		Use:   "explain",
 		Short: "Present documentation about topics.",
 		Long:  "Present documentation about topics.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return nil
-		},
+		RunE:  nil,
 	}
 
 	return cmd

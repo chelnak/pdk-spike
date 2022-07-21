@@ -25,8 +25,8 @@ func GetInstallCmd() *cobra.Command {
 		Use:     "install",
 		Short:   "Installs a template package in tar.gz format or from a git repository.",
 		Long:    "Installs a template package in tar.gz format or from a git repository.",
-		PreRunE: preRun,
-		RunE:    run,
+		PreRunE: installPreRunE,
+		RunE:    installRunE,
 	}
 
 	cmd.Flags().StringVarP(&source, "source", "s", "", "The path of the template package.")
@@ -38,7 +38,7 @@ func GetInstallCmd() *cobra.Command {
 	return cmd
 }
 
-func preRun(cmd *cobra.Command, args []string) error {
+func installPreRunE(cmd *cobra.Command, args []string) error {
 	wd, err := os.Getwd()
 
 	if target == "" && err != nil {
@@ -52,7 +52,7 @@ func preRun(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func run(cmd *cobra.Command, args []string) error {
+func installRunE(cmd *cobra.Command, args []string) error {
 	sm := ysmrr.NewSpinnerManager()
 
 	spinner := sm.AddSpinner("Installing package...")

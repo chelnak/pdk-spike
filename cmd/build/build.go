@@ -27,8 +27,8 @@ func GetBuildCmd() *cobra.Command {
 When building a package you can optionally specify a source directory and a target directory.
 
 If either flag is omitted, the current working directory will be used.`,
-		PreRunE: preRun,
-		RunE:    run,
+		PreRunE: buildPreRunE,
+		RunE:    buildRunE,
 	}
 
 	cmd.Flags().StringVarP(&sourceDir, "source", "s", "", "The project directory that will be packaged.")
@@ -37,7 +37,7 @@ If either flag is omitted, the current working directory will be used.`,
 	return cmd
 }
 
-func preRun(cmd *cobra.Command, args []string) error {
+func buildPreRunE(cmd *cobra.Command, args []string) error {
 	wd, err := os.Getwd()
 
 	if (sourceDir == "" || targetDir == "") && err != nil {
@@ -57,7 +57,7 @@ func preRun(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func run(cmd *cobra.Command, args []string) error {
+func buildRunE(cmd *cobra.Command, args []string) error {
 	sm := ysmrr.NewSpinnerManager()
 	spinner := sm.AddSpinner("Building package...")
 	sm.Start()

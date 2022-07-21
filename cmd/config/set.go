@@ -15,9 +15,7 @@ func getSetCmd() *cobra.Command {
 		Use:   "set",
 		Short: "Sets a configuration property to the specified value value.",
 		Long:  "Sets a configuration property to the specified value value.",
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return config.Set(key, value)
-		},
+		RunE:  setRunE,
 	}
 
 	cmd.Flags().StringVarP(&key, "key", "k", "", "The configuration property to set.")
@@ -27,4 +25,8 @@ func getSetCmd() *cobra.Command {
 	_ = cmd.MarkFlagRequired("value")
 
 	return cmd
+}
+
+func setRunE(cmd *cobra.Command, args []string) error {
+	return config.Set(key, value)
 }

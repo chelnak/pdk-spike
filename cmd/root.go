@@ -36,7 +36,7 @@ so you can install one package with the tools you need to create and validate ne
 PDK includes testing tools, a complete module skeleton, and command line tools to help you create, validate, and run tests on Puppet modules.`,
 		SilenceErrors:     true,
 		SilenceUsage:      true,
-		PersistentPreRunE: persistentPreRun,
+		PersistentPreRunE: rootPersistentPreRunE,
 	}
 
 	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "Path to a config file. This will override the default config file located at $HOME/.config/puppetlabs/pdk/.pdk.yaml.")
@@ -47,7 +47,7 @@ PDK includes testing tools, a complete module skeleton, and command line tools t
 	return rootCmd
 }
 
-func persistentPreRun(cmd *cobra.Command, args []string) error {
+func rootPersistentPreRunE(cmd *cobra.Command, args []string) error {
 	return appConfig.InitConfig(configFile)
 }
 
