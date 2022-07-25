@@ -22,14 +22,12 @@ import (
 var Config config
 
 type config struct {
-	AlwaysBuild   bool   `json:"always_build" yaml:"always_build" mapstructure:"always_build"`
 	Backend       string `json:"backend" yaml:"backend" mapstructure:"backend"`
-	CacheDir      string `json:"cache_dir" yaml:"cache_dir" mapstructure:"cache_dir"`
-	CodeDir       string `json:"code_dir" yaml:"code_dir" mapstructure:"code_dir"`
+	CachePath     string `json:"cache_dir" yaml:"cache_dir" mapstructure:"cache_dir"`
 	PuppetVersion string `json:"puppet_version" yaml:"puppet_version" mapstructure:"puppet_version"`
 	ResultsView   string `json:"results_view" yaml:"results_view" mapstructure:"results_view"`
-	ToolArgs      string `json:"tool_args" yaml:"tool_args" mapstructure:"tool_args"`
 	ToolPath      string `json:"tool_path" yaml:"tool_path" mapstructure:"tool_path"`
+	TemplatePath  string `json:"template_path" yaml:"template_path" mapstructure:"template_path"`
 	ToolTimeout   int    `json:"tool_timeout" yaml:"tool_timeout" mapstructure:"tool_timeout"`
 }
 
@@ -41,12 +39,14 @@ func InitConfig(cfgFile string) error {
 			return fmt.Errorf("error reading config file: %v", err)
 		}
 	} else {
-		home, _ := os.UserHomeDir()
-
 		viper.SetConfigName(".pdk")
 		viper.SetConfigType("yaml")
 
-		cfgPath := filepath.Join(home, ".config", "puppetlabs", "pdk")
+		cfgPath, err := getDefaultConfigPath()
+		if err != nil {
+			return err
+		}
+
 		viper.AddConfigPath(cfgPath)
 
 		if _, err := os.Stat(cfgPath); os.IsNotExist(err) {
@@ -55,7 +55,7 @@ func InitConfig(cfgFile string) error {
 			}
 		}
 
-		setDefaults()
+		setDefaults(cfgPath)
 
 		if err := viper.ReadInConfig(); err != nil {
 			err := viper.SafeWriteConfig()
@@ -75,16 +75,23 @@ func InitConfig(cfgFile string) error {
 	return nil
 }
 
-func setDefaults() {
+func getDefaultConfigPath() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	return filepath.Join(home, ".config", "puppetlabs", "pdk"), nil
+}
+
+func setDefaults(cfgPath string) {
 	// PRM config defaults
-	viper.SetDefault("always_build", false)
 	viper.SetDefault("backend", "docker")
-	viper.SetDefault("cache_dir", "")
-	viper.SetDefault("code_dir", "")
+	viper.SetDefault("cache_dir", filepath.Join(cfgPath, "cache"))
 	viper.SetDefault("puppet_version", "7.14.0")
 	viper.SetDefault("results_view", "terminal")
-	viper.SetDefault("tool_args", "")
-	viper.SetDefault("tool_path", "") // this should be configured config directory /tools
+	viper.SetDefault("tool_path", filepath.Join(cfgPath, "tools"))
+	viper.SetDefault("template_path", filepath.Join(cfgPath, "templates"))
 	viper.SetDefault("tool_timeout", 1800)
 }
 
