@@ -7,7 +7,7 @@ require (
 	github.com/chelnak/ysmrr v0.0.7
 	github.com/puppetlabs/pct v0.0.0-20220615150514-34c540e5f770
 	github.com/rs/zerolog v1.27.0
-	github.com/spf13/afero v1.9.0
+	github.com/spf13/afero v1.9.2
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/viper v1.12.0
 	gopkg.in/yaml.v2 v2.4.0
