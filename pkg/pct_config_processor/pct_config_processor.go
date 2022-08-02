@@ -1,4 +1,5 @@
-package pct_config_processor
+// Package pct_config_processor processes the configuration required to build a template.
+package pct_config_processor // nolint
 
 import (
 	"bytes"
