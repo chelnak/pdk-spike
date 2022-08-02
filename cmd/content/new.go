@@ -7,8 +7,12 @@ func getNewCmd() *cobra.Command {
 		Use:   "new",
 		Short: "Creates a Puppet project or other artifact based on a template.",
 		Long:  "Creates a Puppet project or other artifact based on a template.",
-		RunE:  nil,
+		RunE:  newRunE,
 	}
 
 	return cmd
+}
+
+func newRunE(cmd *cobra.Command, args []string) error {
+	return nil
 }

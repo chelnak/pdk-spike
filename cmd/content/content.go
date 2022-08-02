@@ -10,7 +10,6 @@ func GetContentCmd() *cobra.Command {
 		Use:   "content",
 		Short: "Commands for working with puppet content templates.",
 		Long:  "Commands for working with puppet content templates.",
-		Run:   nil,
 	}
 
 	cmd.AddCommand(getNewCmd())
