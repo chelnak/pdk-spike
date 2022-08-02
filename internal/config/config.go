@@ -17,6 +17,22 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+// Config is a package level variable that holds the current configuration
+// initialized by the InitConfig method.
+var Config config
+
+type config struct {
+	AlwaysBuild   bool   `json:"always_build" yaml:"always_build" mapstructure:"always_build"`
+	Backend       string `json:"backend" yaml:"backend" mapstructure:"backend"`
+	CacheDir      string `json:"cache_dir" yaml:"cache_dir" mapstructure:"cache_dir"`
+	CodeDir       string `json:"code_dir" yaml:"code_dir" mapstructure:"code_dir"`
+	PuppetVersion string `json:"puppet_version" yaml:"puppet_version" mapstructure:"puppet_version"`
+	ResultsView   string `json:"results_view" yaml:"results_view" mapstructure:"results_view"`
+	ToolArgs      string `json:"tool_args" yaml:"tool_args" mapstructure:"tool_args"`
+	ToolPath      string `json:"tool_path" yaml:"tool_path" mapstructure:"tool_path"`
+	ToolTimeout   int    `json:"tool_timeout" yaml:"tool_timeout" mapstructure:"tool_timeout"`
+}
+
 func InitConfig(cfgFile string) error {
 	if cfgFile != "" {
 		viper.SetConfigFile(cfgFile)
@@ -47,10 +63,14 @@ func InitConfig(cfgFile string) error {
 				return fmt.Errorf("failed to write config: %s", err)
 			}
 		}
-	}
 
-	viper.AutomaticEnv()
-	viper.SetEnvPrefix("PDK")
+		viper.AutomaticEnv()
+		viper.SetEnvPrefix("PDK")
+
+		if err := viper.Unmarshal(&Config); err != nil {
+			return fmt.Errorf("failed to unmarshal config: %s", err)
+		}
+	}
 
 	return nil
 }
