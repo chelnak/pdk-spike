@@ -12,7 +12,6 @@ func GetRuntimeCmd() *cobra.Command {
 		Use:   "runtime",
 		Short: "Manage the runtime used by PDK.",
 		Long:  "Manage the runtime used by PDK.",
-		Run:   nil,
 	}
 
 	cmd.AddCommand(getStatusCmd())
