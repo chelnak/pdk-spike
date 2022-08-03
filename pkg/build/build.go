@@ -10,12 +10,11 @@ import (
 	"github.com/puppetlabs/pct/pkg/config_processor"
 	"github.com/puppetlabs/pct/pkg/gzip"
 	"github.com/puppetlabs/pct/pkg/tar"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/afero"
 )
 
 type Builder interface {
-	Build(sourceDir, targetDir string) (gzipArchiveFilePath string, err error)
+	Build(source, target string) (archivePath string, err error)
 }
 
 type builder struct {
@@ -26,54 +25,62 @@ type builder struct {
 	ConfigFile      string
 }
 
-func (b *builder) Build(sourceDir, targetDir string) (gzipArchiveFilePath string, err error) {
+func (b *builder) Build(source, target string) (archivePath string, err error) {
+	if err := b.validateProjectStructure(source); err != nil {
+		return archivePath, err
+	}
+
+	if err := b.ConfigProcessor.CheckConfig(filepath.Join(source, b.ConfigFile)); err != nil {
+		return archivePath, fmt.Errorf("invalid config: %v", err.Error())
+	}
+
+	return b.makeArchive(source, target)
+}
+
+func (b *builder) validateProjectStructure(source string) error {
 	// Check project dir exists
-	if _, err := b.AFS.Stat(sourceDir); os.IsNotExist(err) {
-		return "", fmt.Errorf("no project directory at %v", sourceDir)
+	if _, err := b.AFS.Stat(source); os.IsNotExist(err) {
+		return fmt.Errorf("no project directory at %v", source)
 	}
 
 	// Check if config file exists
-	if _, err := b.AFS.Stat(filepath.Join(sourceDir, b.ConfigFile)); os.IsNotExist(err) {
-		return "", fmt.Errorf("no '%v' found in %v", b.ConfigFile, sourceDir)
-	}
-
-	err = b.ConfigProcessor.CheckConfig(filepath.Join(sourceDir, b.ConfigFile))
-	if err != nil {
-		return "", fmt.Errorf("invalid config: %v", err.Error())
+	if _, err := b.AFS.Stat(filepath.Join(source, b.ConfigFile)); os.IsNotExist(err) {
+		return fmt.Errorf("no '%v' found in %v", b.ConfigFile, source)
 	}
 
 	// Check if content dir exists
-	if _, err := b.AFS.Stat(filepath.Join(sourceDir, "content")); os.IsNotExist(err) {
-		return "", fmt.Errorf("no 'content' dir found in %v", sourceDir)
+	if _, err := b.AFS.Stat(filepath.Join(source, "content")); os.IsNotExist(err) {
+		return fmt.Errorf("no 'content' dir found in %v", source)
 	}
 
-	// Create temp dir and TAR project there
+	return nil
+}
+
+func (b *builder) makeArchive(source, target string) (string, error) {
+	var archivePath string
+
 	tempDir, err := b.AFS.TempDir("", "")
+	if err != nil {
+		return archivePath, fmt.Errorf("could not create tempdir: %v", err)
+	}
+
 	defer func() {
-		if cleanErr := os.RemoveAll(tempDir); cleanErr != nil {
+		if cleanErr := os.RemoveAll(tempDir); cleanErr != nil && err == nil {
 			err = fmt.Errorf("error cleaning up temp dir: %v", cleanErr)
 		}
 	}()
 
+	tar, err := b.Tar.Tar(source, tempDir)
 	if err != nil {
-		log.Error().Msgf("could not create tempdir to TAR project: %v", err)
-		return "", err
+		return archivePath, fmt.Errorf("could not TAR project (%v): %v", source, err)
 	}
 
-	tarArchiveFilePath, err := b.Tar.Tar(sourceDir, tempDir)
+	archivePath, err = b.Gzip.Gzip(tar, target)
 	if err != nil {
-		log.Error().Msgf("could not TAR project (%v): %v", sourceDir, err)
-		return "", err
+		return archivePath, fmt.Errorf("could not GZIP project (%v): %v", tar, err)
 	}
 
-	// GZIP the TAR created in the temp dir and output to the /pkg directory in the target directory
-	gzipArchiveFilePath, err = b.Gzip.Gzip(tarArchiveFilePath, targetDir)
-	if err != nil {
-		log.Error().Msgf("could not GZIP project TAR archive (%v): %v", tarArchiveFilePath, err)
-		return "", err
-	}
-
-	return gzipArchiveFilePath, nil
+	return archivePath, nil
 }
 
 func NewBuilder() Builder {
