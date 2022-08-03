@@ -7,16 +7,16 @@ import (
 	"runtime"
 )
 
-type ExecI interface {
+type ExecRunner interface {
 	Command(name string, arg ...string) error
 	Output() ([]byte, error)
 }
 
-type Exec struct {
+type execRunner struct {
 	cmd *exec.Cmd
 }
 
-func (e *Exec) Command(name string, arg ...string) error {
+func (e *execRunner) Command(name string, args ...string) error {
 	var pathToExecutable string
 	var err error
 
@@ -30,26 +30,30 @@ func (e *Exec) Command(name string, arg ...string) error {
 		return err
 	}
 
-	correctArgs := buildCommandArgs(name, arg)
 	cmd := &exec.Cmd{
 		Path: pathToExecutable,
-		Args: correctArgs,
+		Args: buildCommandArgs(name, args),
 		Env:  os.Environ(),
 	}
 	e.cmd = cmd
 	return nil
 }
 
-func (e *Exec) Output() ([]byte, error) {
+func (e *execRunner) Output() ([]byte, error) {
 	return e.cmd.Output()
 }
 
 func buildCommandArgs(commandName string, args []string) []string {
-	var a []string
+	var cmd []string
+
 	if runtime.GOOS == "windows" {
-		a = append(a, "/c")
+		cmd = append(cmd, "/c")
 	}
-	a = append(a, commandName)
-	a = append(a, args...)
-	return a
+	cmd = append(cmd, commandName)
+
+	return append(cmd, args...)
+}
+
+func NewExecRunner() ExecRunner {
+	return &execRunner{}
 }

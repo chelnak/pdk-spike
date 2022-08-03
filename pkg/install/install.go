@@ -37,7 +37,7 @@ type installer struct {
 	AFS             *afero.Afero
 	IOFS            *afero.IOFS
 	HTTPClient      httpclient.HTTPClientI
-	Exec            exec_runner.ExecI
+	Exec            exec_runner.ExecRunner
 	ConfigProcessor config_processor.ConfigProcessorI
 	ConfigFile      string
 }
@@ -242,12 +242,14 @@ func (p *installer) InstallFromConfig(configFile, targetDir string, force bool) 
 
 func NewInstaller() Installer {
 	fs := afero.NewOsFs()
+	execRunner := exec_runner.NewExecRunner()
+
 	return &installer{
 		Tar:             &tar.Tar{AFS: &afero.Afero{Fs: fs}},
 		Gunzip:          &gzip.Gunzip{AFS: &afero.Afero{Fs: fs}},
 		AFS:             &afero.Afero{Fs: fs},
 		IOFS:            &afero.IOFS{Fs: fs},
-		Exec:            &exec_runner.Exec{},
+		Exec:            execRunner,
 		ConfigProcessor: &pct_config_processor.PctConfigProcessor{AFS: &afero.Afero{Fs: fs}},
 		ConfigFile:      "pct-config.yml",
 	}
