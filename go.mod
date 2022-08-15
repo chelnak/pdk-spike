@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/alecthomas/chroma v0.10.0
-	github.com/chelnak/ysmrr v0.0.7
+	github.com/chelnak/ysmrr v0.1.0
 	github.com/puppetlabs/pct v0.0.0-20220615150514-34c540e5f770
 	github.com/spf13/afero v1.9.2
 	github.com/spf13/cobra v1.5.0
